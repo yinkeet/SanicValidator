@@ -9,5 +9,10 @@ setup(
     author_email='yinkeet@gmail.com',
     license='unlicense',
     packages=['SanicValidator'],
-    zip_safe=False
+    zip_safe=False,
+    install_requires = [
+        'cerebrus==1.3',
+        'pymongo',
+        'sanic'
+    ]
 )
