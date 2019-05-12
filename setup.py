@@ -4,10 +4,10 @@ setup(
     name='sanic-validator',
     version='0.0.1',
     description='Validators for use with sanic',
-    url='git@github.com:yinkeet/sanic-validator.git',
+    url='git@github.com:yinkeet/SanicValidator.git',
     author='Wong Yin Keet',
     author_email='yinkeet@gmail.com',
     license='unlicense',
-    packages=['sanic-validator'],
+    packages=['SanicValidator'],
     zip_safe=False
 )
