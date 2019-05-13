@@ -6,6 +6,8 @@ from cerberus import Validator
 from sanic.exceptions import InvalidUsage, NotFound
 from sanic.request import File, Request
 
+from .dependency_injection import Dependencies
+
 
 class CustomValidator(Validator):
     def __init__(self, request=None, *args, **kwargs):
@@ -44,6 +46,26 @@ class CustomValidator(Validator):
         return int(value)
 
     # Validates
+    def _validate_check_existence(self, check_existence, field, value):
+        """
+        'check_existence': {
+            'name': 'profiles',
+            'lookup': True,
+            'map': {
+                'profiles': {
+                    'name': 'profiles',
+                    'not_found': 'User not found'
+                }
+            }
+        }
+        """
+        if 'lookup' in check_existence and check_existence['lookup']:
+            check_existence['name'] = self._lookup_field(check_existence['name'])
+
+        collection_metadata = check_existence['map'][check_existence['name']]
+        if not Dependencies().get_component('document_exists')(collection_metadata['name'], value):
+            self._error(field, collection_metadata['not_found'])
+
     def _validate_allowed_path(self, allowed_path, field, value):
         if isinstance(allowed_path, str):
             allowed_path = [allowed_path]
