@@ -11,7 +11,7 @@ setup(
     packages=['chimera'],
     zip_safe=False,
     install_requires = [
-        'cerebrus==1.3',
+        'cerberus',
         'pymongo',
         'sanic'
     ]
