@@ -6,7 +6,13 @@ class Conflict(SanicException):
 
 class DocumentNotFound(NotFound):
     def __init__(self, field, value, document_name='document', extra=None):
-        messages = ['{} \'{}\' not found'.format(document_name.capitalize(), value)]
+        messages = []
+        template = document_name.capitalize() + ' \'{}\' not found'
+        if isinstance(value, str):
+            messages.append([template.format(value)])
+        if isinstance(value, list):
+            messages.extend([template.format(item) for item in value])
+        
         if isinstance(extra, str):
             messages.append(extra)
         if isinstance(extra, list):
