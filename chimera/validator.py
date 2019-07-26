@@ -8,7 +8,7 @@ from sanic.request import File, Request
 
 
 class CustomValidator(Validator):
-    def __init__(self, request=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.request = kwargs['request']
         super(CustomValidator, self).__init__(*args, **kwargs)
 
