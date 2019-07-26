@@ -6,13 +6,11 @@ from cerberus import Validator
 from sanic.exceptions import InvalidUsage, NotFound
 from sanic.request import File, Request
 
-from .dependency_injection import Dependencies
-
 
 class CustomValidator(Validator):
     def __init__(self, request=None, *args, **kwargs):
+        self.request = kwargs['request']
         super(CustomValidator, self).__init__(*args, **kwargs)
-        self.request = request
 
     # Types
     def _validate_type_object_id(self, value):
@@ -27,6 +25,13 @@ class CustomValidator(Validator):
             ObjectId(value)
         except InvalidId as _error:
             self._error(field, "invalid id")
+
+    def _check_with_ip_address_validator(self, field, value):
+        import socket
+        try:
+            socket.inet_aton(value)
+        except socket.error:
+            self._error(field, "Malformed IP address")
 
     # Coerce
     def _normalize_coerce_json(self, value):
@@ -60,10 +65,10 @@ class CustomValidator(Validator):
         }
         """
         if 'lookup' in check_existence and check_existence['lookup']:
-            check_existence['name'] = self._lookup_field(check_existence['name'])
+            check_existence['name'] = self._lookup_field(check_existence['name'])[1]
 
         collection_metadata = check_existence['map'][check_existence['name']]
-        if not Dependencies().get_component('document_exists')(collection_metadata['name'], value):
+        if not self.request.app.dependencies.get_component('document_exists')(collection_metadata['name'], value):
             self._error(field, collection_metadata['not_found'])
 
     def _validate_allowed_path(self, allowed_path, field, value):
