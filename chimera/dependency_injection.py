@@ -1,15 +1,16 @@
 import pkgutil
 
+from functools import wraps
+from inspect import signature
+
 from sanic.log import logger
 
-
 class Dependencies(object):
-    __instance = None
-    def __new__(cls):
-        if Dependencies.__instance is None:
-            Dependencies.__instance = object.__new__(cls)
-            Dependencies.__components = {}
-        return Dependencies.__instance
+    def __init__(self, app, loop):
+        self.app = app
+        self.loop = loop
+        self.__components = {}
+        self.app.dependencies = self
 
     def register_package(self, package):
         logger.debug('Register package \'' + package.__name__ + '\'')
@@ -20,20 +21,14 @@ class Dependencies(object):
                     instance = getattr(module, attr)
                     if(issubclass(type(instance), Register)):
                         logger.debug('Register component \'' + module.__name__ + '.' + attr + '\' as ' + instance.name)
-                        if instance.register_return:
-                            self.__components[instance.name] = instance.function()
-                        else:
-                            self.__components[instance.name] = instance.function
+                        self._register(instance)
 
     def register_module(self, module):
         for attr in dir(module):
             instance = getattr(module, attr)
             if(issubclass(type(instance), Register)):
                 logger.debug('Register component \'' + module.__name__ + '.' + attr + '\' as ' + instance.name)
-                if instance.register_return:
-                    self.__components[instance.name] = instance.function()
-                else:
-                    self.__components[instance.name] = instance.function
+                self._register(instance)
 
     def register(self, name, object):
         logger.debug('Register component ' + name)
@@ -46,22 +41,32 @@ class Dependencies(object):
     def exists(self, name):
         return name in self.__components
 
+    def _register(self, instance):
+        parameters = signature(instance.function).parameters
+        if 'app' in parameters and 'loop' in parameters:
+            self.__components[instance.name] = instance.function(self.app, self.loop)
+        elif 'app' in parameters:
+            self.__components[instance.name] = instance.function(self.app)
+        elif 'loop' in parameters:
+            self.__components[instance.name] = instance.function(self.loop)
+        else:
+            self.__components[instance.name] = instance.function()
+
 class Register(object):
-    def __init__(self, name, register_return=False):
+    def __init__(self, name):
         self.name = name
-        self.register_return = register_return
 
     def __call__(self, function):
         self.function = function
         return self
 
 def inject(function):
-    def wrapper(*args, **kwargs):
-        from inspect import signature
+    @wraps(function)    
+    async def wrapper(request, *args, **kwargs):
         for parameter in signature(function).parameters:
-            if Dependencies().exists(parameter):
-                kwargs[parameter] = Dependencies().get_component(parameter)
+            dependencies = request.app.dependencies
+            if dependencies.exists(parameter):
+                kwargs[parameter] = dependencies.get_component(parameter)
 
-        return function(*args, **kwargs)
-
+        return await function(request, *args, **kwargs)
     return wrapper
