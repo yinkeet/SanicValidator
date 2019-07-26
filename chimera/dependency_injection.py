@@ -6,6 +6,10 @@ from inspect import signature
 from sanic.log import logger
 
 class Dependencies(object):
+    @staticmethod
+    def load(app):
+        return app.dependencies
+
     def __init__(self, app, loop):
         self.app = app
         self.loop = loop
