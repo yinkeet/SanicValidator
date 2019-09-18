@@ -4,6 +4,10 @@ from sanic.exceptions import add_status_code, SanicException, NotFound
 class Conflict(SanicException):
     pass
 
+@add_status_code(422)
+class UnprocessableEntity(SanicException):
+    pass
+
 class DocumentNotFound(NotFound):
     def __init__(self, field, value, document_name='document', extra=None):
         messages = []
