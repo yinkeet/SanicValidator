@@ -1,4 +1,5 @@
 from functools import wraps
+from inspect import signature
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
@@ -128,6 +129,32 @@ class ValidateRequest(object):
             validated = kwargs.get('validated', {})
             validated[self.request_property] = validator.document
             kwargs['validated'] = validated
+
+            return await function(request, *args, **kwargs)
+
+        return wrapper
+
+class Validate(object):
+    def __init__(self, schema: dict, request_property: str):
+        self.schema = schema
+        self.request_property = request_property
+
+    def __call__(self, function):
+        @wraps(function)
+        async def wrapper(request, *args, **kwargs):
+            if self.request_property == 'path':
+                validator = CustomValidator(request=request, schema=self.schema, allow_unknown=True)
+                if not validator.validate(kwargs):
+                    raise InvalidUsage(validator.errors)
+            else:
+                validator = CustomValidator(request=request, schema=self.schema, purge_unknown=True)
+                document = getattr(request, self.request_property, {})
+                document = dict(document) if document else {}
+                if not validator.validate(document):
+                    raise InvalidUsage(validator.errors)
+
+            if self.request_property in signature(function).parameters:
+                kwargs[self.request_property] = validator.document 
 
             return await function(request, *args, **kwargs)
 
