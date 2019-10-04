@@ -1,4 +1,5 @@
 from functools import wraps
+from inspect import signature
 
 from sanic.exceptions import Forbidden
 
@@ -14,6 +15,9 @@ class Authenticate(object):
             allowed = any(scope in scopes  for scope in self.allowed_scopes)
             if not allowed:
                 raise Forbidden(['Insufficient scope: authorized scope is insufficient'])
+            # User id injection
+            if 'id' in signature(function).parameters:
+                kwargs['id'] = request.headers.get('user-id')
             return await function(request, *args, **kwargs)
 
         return wrapper
