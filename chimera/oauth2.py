@@ -11,7 +11,8 @@ class Authenticate(object):
     def __call__(self, function):
         @wraps(function)
         async def wrapper(request, *args, **kwargs):
-            scopes = request.headers.get('scope', '').split()
+            headers = dict(getattr(request, 'headers', {}))
+            scopes = headers.get('scope', '').split()
             allowed = any(scope in scopes  for scope in self.allowed_scopes)
             if not allowed:
                 raise Forbidden(['Insufficient scope: authorized scope is insufficient'])

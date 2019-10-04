@@ -142,19 +142,17 @@ class Validate(object):
     def __call__(self, function):
         @wraps(function)
         async def wrapper(request, *args, **kwargs):
-            if self.request_property == 'path':
-                validator = CustomValidator(request=request, schema=self.schema, allow_unknown=True)
-                if not validator.validate(kwargs):
-                    raise InvalidUsage(validator.errors)
-                return await function(request, *args, **validator.document)
-            else:
-                validator = CustomValidator(request=request, schema=self.schema, purge_unknown=True)
-                document = getattr(request, self.request_property, {})
-                document = dict(document) if document else {}
-                if not validator.validate(document):
-                    raise InvalidUsage(validator.errors)
-                if self.request_property in signature(function).parameters:
-                    kwargs[self.request_property] = validator.document
-                return await function(request, *args, **kwargs)
+            validator = CustomValidator(request=request, schema=self.schema, purge_unknown=True)
+            
+            document = getattr(request, self.request_property, {})
+            document = dict(document) if document else {}
+
+            if not validator.validate(document):
+                raise InvalidUsage(validator.errors)
+
+            if self.request_property in signature(function).parameters:
+                kwargs[self.request_property] = validator.document
+
+            return await function(request, *args, **kwargs)
 
         return wrapper
