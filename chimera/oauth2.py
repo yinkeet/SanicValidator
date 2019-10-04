@@ -5,8 +5,9 @@ from sanic.exceptions import Forbidden
 
 
 class Authenticate(object):
-    def __init__(self, allowed_scopes: list):
+    def __init__(self, allowed_scopes: list=[], inject_header: dict={}):
         self.allowed_scopes = allowed_scopes
+        self.inject_header = inject_header
 
     def __call__(self, function):
         @wraps(function)
@@ -15,9 +16,9 @@ class Authenticate(object):
             allowed = any(scope in scopes  for scope in self.allowed_scopes)
             if not allowed:
                 raise Forbidden(['Insufficient scope: authorized scope is insufficient'])
-            # User id injection
-            if 'id' in signature(function).parameters:
-                kwargs['id'] = request.headers.get('user-id')
+            for key, value in self.inject_header.items():
+                if value in signature(function).parameters:
+                    kwargs[value] = request.headers.get(key)
             return await function(request, *args, **kwargs)
 
         return wrapper
