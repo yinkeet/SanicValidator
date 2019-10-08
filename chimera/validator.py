@@ -152,7 +152,8 @@ class Validate(object):
             if not validator.validate(document):
                 raise InvalidUsage(validator.errors)
 
-            kwargs[self.request_property] = validator.document
+            if self.request_property in signature(function).parameters:
+                kwargs[self.request_property] = validator.document
 
             return await function(request, *args, **kwargs)
 
