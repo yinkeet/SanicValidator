@@ -46,7 +46,9 @@ class CustomValidator(Validator):
         return ObjectId(value)
 
     def _normalize_coerce_boolean(self, value):
-        return value.lower() in ('true', '1')
+        if isinstance(value, str):
+            return value.lower() in ('true', '1')
+        return True if value else False
 
     def _normalize_coerce_integer(self, value):
         return int(value)
