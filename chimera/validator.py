@@ -53,6 +53,9 @@ class CustomValidator(Validator):
     def _normalize_coerce_integer(self, value):
         return int(value)
 
+    def _normalize_coerce_float(self, value):
+        return float(value)
+
     # Validates
     def _validate_check_existence(self, check_existence, field, value):
         """
