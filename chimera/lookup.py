@@ -4,11 +4,11 @@ from functools import partial
 from sanic.log import logger
 from sanic.exceptions import ServerError
 
-import requests
+from requests import get
 
 
-async def lookup1(url, params, return_id):
-    response = await get_event_loop().run_in_executor(None, partial(requests.get, 
+async def lookup(url, params, return_id):
+    response = await get_event_loop().run_in_executor(None, partial(get, 
         url=url,
         params=params
     ))
