@@ -17,7 +17,9 @@ async def lookup(url, params, return_id):
         logger.error(response.text)
         raise ServerError(['Lookup has encountered an error', url, params])
 
-    results = response.json()['results'][0]
+    results = response.json()['results']
+    if len(results):
+        results = response.json()['results'][0]
 
     return {
         'id': return_id,
