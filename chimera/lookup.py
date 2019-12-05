@@ -7,10 +7,11 @@ from sanic.exceptions import ServerError
 from requests import get, post
 
 
-async def lookup(url, params, return_id):
+async def lookup(url, params=None, json=None, return_id=None):
     response = await get_event_loop().run_in_executor(None, partial(get, 
         url=url,
-        params=params
+        params=params,
+        json=json
     ))
 
     if response.status_code != 200:
@@ -21,26 +22,7 @@ async def lookup(url, params, return_id):
     if len(results):
         results = response.json()['results'][0]
 
-    return {
-        'id': return_id,
-        'results': results
-    }
-
-async def post(url, json, return_id):
-    response = await get_event_loop().run_in_executor(None, partial(post, 
-        url=url,
-        json=json
-    ))
-
-    if response.status_code != 200:
-        logger.error(response.text)
-        raise ServerError(['Lookup has encountered an error', url, json])
-
-    results = response.json()['results']
-    if len(results):
-        results = response.json()['results'][0]
-
-    return {
-        'id': return_id,
-        'results': results
-    }
+    response = {'results': results}
+    if return_id:
+        response['id'] = return_id
+    return response
