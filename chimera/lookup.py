@@ -4,7 +4,7 @@ from functools import partial
 from sanic.log import logger
 from sanic.exceptions import ServerError
 
-from requests import get, post
+from requests import get
 
 
 async def lookup(url, params=None, json=None, return_id=None):
@@ -16,7 +16,7 @@ async def lookup(url, params=None, json=None, return_id=None):
 
     if response.status_code != 200:
         logger.error(response.text)
-        raise ServerError(['Lookup has encountered an error', url, params])
+        raise ServerError(['Lookup has encountered an error', url, params, json])
 
     results = response.json()['results']
     if len(results):
