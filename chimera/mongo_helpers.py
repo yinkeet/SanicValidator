@@ -17,7 +17,9 @@ async def custom_aggregate(collection, query, function_name=None):
     if function_name:
         logger.debug('%s query %s', function_name, query)
     
-    output = (await collection.aggregate(query).fetch_next).next_object()
+    cursor = collection.aggregate(query)
+    output = await cursor.fetch_next
+    output = cursor.next_object()
 
     if function_name:
         logger.debug('%s response %s', function_name, output)
