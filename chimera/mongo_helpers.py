@@ -21,3 +21,5 @@ async def custom_aggregate(collection, query, function_name=None):
 
     if function_name:
         logger.debug('%s response %s', function_name, output)
+
+    return output
