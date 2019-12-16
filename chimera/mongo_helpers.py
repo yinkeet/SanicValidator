@@ -13,6 +13,18 @@ def create_sort_query(fields):
 
     return { (field.lower()):(1 if field.isupper() else -1) for field in results }
 
+def create_group_query(field, to_string=True):
+    field = '$' + field
+    return [
+        {'$group': {
+            '_id': None,
+            'results': {'$addToSet': {'$toString': field} if to_string else field}
+        }},
+        {'$project': {
+            '_id': 0
+        }},
+    ]
+
 def create_facet_extract_query(field, subfield):
     field = '$' + field
     return {'$cond': [
