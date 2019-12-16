@@ -13,6 +13,17 @@ def create_sort_query(fields):
 
     return { (field.lower()):(1 if field.isupper() else -1) for field in results }
 
+def create_facet_extract_query(field, subfield):
+    field = '$' + field
+    return {'$cond': [
+        {'$gt': [{'$size': field}, 0]},
+        {'$let': {
+            'vars': {'temp': {'$arrayElemAt': [field, 0]}},
+            'in': '$$temp.' + subfield
+        }},
+        field
+    ]}
+
 async def custom_aggregate(collection, query, function_name=None):
     if function_name:
         logger.debug('%s query %s', function_name, query)
