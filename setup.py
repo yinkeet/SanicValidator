@@ -12,6 +12,7 @@ setup(
     zip_safe=False,
     install_requires = [
         'cerberus',
+        'requests',
         'pymongo',
         'sanic'
     ]
