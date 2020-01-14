@@ -60,7 +60,7 @@ class CustomValidator(Validator):
     def _validate_check_existence(self, check_existence, field, value):
         """ Tests the existence of a mongo id against a collection.
         The rule's arguments are validated against this schema:
-        'check_existence': {
+        {'check_existence': {
             'name': 'profiles',
             'lookup': True,
             'map': {
@@ -69,7 +69,7 @@ class CustomValidator(Validator):
                     'not_found': 'User not found'
                 }
             }
-        }
+        }}
         """
         if 'lookup' in check_existence and check_existence['lookup']:
             check_existence['name'] = self._lookup_field(check_existence['name'])[1]
