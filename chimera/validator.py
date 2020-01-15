@@ -59,7 +59,6 @@ class CustomValidator(Validator):
     # Validates
     def _validate_check_existence(self, check_existence, field, value):
         """ Tests the existence of a mongo id against a collection.
-        The rule's arguments are validated against this schema:
         {'check_existence': {
             'name': 'profiles',
             'lookup': True,
@@ -70,6 +69,8 @@ class CustomValidator(Validator):
                 }
             }
         }}
+        The rule's arguments are validated against this schema:
+        {'type': 'string'}
         """
         if 'lookup' in check_existence and check_existence['lookup']:
             check_existence['name'] = self._lookup_field(check_existence['name'])[1]
@@ -80,8 +81,9 @@ class CustomValidator(Validator):
 
     def _validate_allowed_path(self, allowed_path, field, value):
         """ Tests the validity of the string and raises a not found error if it is invalid.
-        The rule's arguments are validated against this schema:
         {'allowed_path': ['likes', 'views']}
+        The rule's arguments are validated against this schema:
+        {'type': 'string'}
         """
         if isinstance(allowed_path, str):
             allowed_path = [allowed_path]
@@ -94,8 +96,9 @@ class CustomValidator(Validator):
 
     def _validate_allowed_content_type(self, allowed_content_type, field, value):
         """ Tests the content type of a file.
-        The rule's arguments are validated against this schema:
         {'allowed_content_type': 'image/jpeg'}
+        The rule's arguments are validated against this schema:
+        {'type': 'string'}
         """
         if value.type not in allowed_content_type:
             self._error(field, "Content type not allowed")
