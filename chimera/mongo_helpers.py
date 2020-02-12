@@ -36,6 +36,15 @@ def create_facet_extract_query(field, subfield):
         field
     ]}
 
+def create_to_strings_query(field):
+    return {
+        '$map': {
+            'input': '$' + field,
+            'as': 'temp',
+            'in': {'$toString': '$$temp'}
+        }
+    }
+
 async def custom_aggregate(collection, query, function_name=None):
     if function_name:
         logger.debug('%s query %s', function_name, query)
