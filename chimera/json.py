@@ -47,3 +47,22 @@ def load(fp, *, cls=None, object_hook=None, parse_float=None, parse_int=None, pa
         raise error # pylint: disable-msg=E0702
 
     return output
+
+def load_file(path, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, buffer_size=1024, **kw):
+    if cls is not None:
+        kw['cls'] = cls
+    if object_hook is not None:
+        kw['object_hook'] = object_hook
+    if object_pairs_hook is not None:
+        kw['object_pairs_hook'] = object_pairs_hook
+    if parse_float is not None:
+        kw['parse_float'] = parse_float
+    if parse_int is not None:
+        kw['parse_int'] = parse_int
+    if parse_constant is not None:
+        kw['parse_constant'] = parse_constant
+    if buffer_size is not None:
+        kw['buffer_size'] = buffer_size
+    with open(path) as f:
+        data = load(f, **kw)
+    return data
