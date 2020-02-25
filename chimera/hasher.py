@@ -9,4 +9,4 @@ def md5(objects):
 def crc32(json_string: str):
     dictionary = loads(json_string)
     sorted_encoded_json_string = dumps(dictionary, sort_keys=True).encode('utf-8')
-    return zlib_crc32(sorted_encoded_json_string.encode('utf-8'))
+    return zlib_crc32(sorted_encoded_json_string)
