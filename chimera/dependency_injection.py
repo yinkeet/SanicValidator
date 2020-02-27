@@ -1,9 +1,10 @@
 import pkgutil
-
 from functools import wraps
 from inspect import signature
+from typing import Any, cast, get_type_hints
 
 from sanic.log import logger
+
 
 def get_component(app, name):
     return app.dependencies.get_component(name)
@@ -46,14 +47,12 @@ class Dependencies(object):
 
     def _register(self, instance):
         parameters = signature(instance.function).parameters
-        if 'app' in parameters and 'loop' in parameters:
-            self.__components[instance.name] = instance.function(self.app, self.loop)
-        elif 'app' in parameters:
-            self.__components[instance.name] = instance.function(self.app)
-        elif 'loop' in parameters:
-            self.__components[instance.name] = instance.function(self.loop)
-        else:
-            self.__components[instance.name] = instance.function()
+        kw = {}
+        if 'app' in parameters:
+            kw['app'] = self.app
+        if 'loop' in parameters:
+            kw['app'] = self.loop
+        self.__components[instance.name] = instance.function(**kw)
 
 class Register(object):
     def __init__(self, name):

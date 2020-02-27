@@ -1,10 +1,13 @@
 import re
-from bson.json_util import object_hook
-from json import JSONDecoder, JSONDecodeError
+from json import JSONDecodeError, JSONDecoder, load
 
 _NOT_WHITESPACE = re.compile(r'[^\s]')
 
-def load(fp, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, buffer_size=1024, **kw):
+def load_file(filepath: str):
+    with open(filepath, 'r') as f:
+        return load(f)
+
+def load_stacked(fp, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, buffer_size=1024, **kw):
     if cls is None:
         cls = JSONDecoder
     if object_hook is not None:
@@ -48,7 +51,7 @@ def load(fp, *, cls=None, object_hook=None, parse_float=None, parse_int=None, pa
 
     return output
 
-def load_file(path, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, buffer_size=1024, **kw):
+def load_stacked_file(path, *, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, buffer_size=1024, **kw):
     if cls is not None:
         kw['cls'] = cls
     if object_hook is not None:
@@ -64,5 +67,5 @@ def load_file(path, *, cls=None, object_hook=None, parse_float=None, parse_int=N
     if buffer_size is not None:
         kw['buffer_size'] = buffer_size
     with open(path) as f:
-        data = load(f, **kw)
+        data = load_stacked(f, **kw)
     return data
