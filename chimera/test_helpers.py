@@ -3,6 +3,7 @@ class MockResponse:
         self.status_code = status_code
         self.json_response = json_response
 
+    @property
     def text(self):
         return ''
 
