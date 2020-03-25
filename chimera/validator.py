@@ -3,30 +3,22 @@ from inspect import signature
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
-from cerberus import Validator
+from cerberus import Validator, TypeDefinition
 from sanic.exceptions import InvalidUsage, NotFound
 from sanic.request import File, Request
 
 
 class CustomValidator(Validator):
+    # Types
+    types_mapping = Validator.types_mapping.copy()
+    types_mapping['object_id'] = TypeDefinition('object_id', (ObjectId,), ())
+    types_mapping['file'] = TypeDefinition('file', (File,), ())
+
     def __init__(self, *args, **kwargs):
         self.request = kwargs['request']
         super(CustomValidator, self).__init__(*args, **kwargs)
 
-    # Types
-    def _validate_type_object_id(self, value):
-        return isinstance(value, ObjectId)
-    
-    def _validate_type_file(self, value):
-        return isinstance(value, File)
-
     # Checks
-    def _check_with_object_id_validator(self, field, value):
-        try:
-            ObjectId(value)
-        except InvalidId as _error:
-            self._error(field, "invalid id")
-
     def _check_with_ip_address_validator(self, field, value):
         import socket
         try:
