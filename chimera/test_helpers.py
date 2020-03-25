@@ -1,7 +1,9 @@
 from datetime import datetime
 
 from bson import ObjectId
+from cerberus import TypeDefinition
 from cerberus import Validator as BaseValidator
+from sanic.request import File
 
 
 class MockResponse:
@@ -18,8 +20,7 @@ class MockResponse:
 
 class Validator(BaseValidator):
     # Types
-    def _validate_type_object_id(self, value):
-        return isinstance(value, ObjectId)
-
-    def _validate_type_datetime(self, value):
-        return isinstance(value, datetime)
+    types_mapping = BaseValidator.types_mapping.copy()
+    types_mapping['file'] = TypeDefinition('file', (File,), ())
+    types_mapping['datetime'] = TypeDefinition('datetime', (datetime,), ())
+    types_mapping['object_id'] = TypeDefinition('object_id', (ObjectId,), ())
