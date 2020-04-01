@@ -8,16 +8,6 @@ from cerberus import Validator as BaseValidator
 from sanic.request import File
 
 
-class MockResponsesFactory:
-    def __init__(self, original_responses: dict):
-        self.original_responses = original_responses
-
-    def build(self, *replacements: Tuple[str, str, MockResponse]):
-        responses = deepcopy(self.original_responses)
-        for method, url, response in replacements:
-            responses[method][url] = response
-        return responses
-
 class MockResponse:
     def __init__(self, status_code: int, json_response: dict):
         self.status_code = status_code
@@ -29,6 +19,16 @@ class MockResponse:
 
     def json(self, **kwargs):
         return self.json_response
+        
+class MockResponsesFactory:
+    def __init__(self, original_responses: dict):
+        self.original_responses = original_responses
+
+    def build(self, *replacements: Tuple[str, str, MockResponse]):
+        responses = deepcopy(self.original_responses)
+        for method, url, response in replacements:
+            responses[method][url] = response
+        return responses
 
 class Validator(BaseValidator):
     # Types
