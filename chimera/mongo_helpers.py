@@ -57,3 +57,7 @@ async def custom_aggregate(collection, query, function_name=None, session=None):
         logger.debug('%s response %s', function_name, output)
 
     return output
+
+def remove_field_if_empty_query(field):
+    ref_field = '$' + field
+    return {'$cond': [{'$gt': [{'$size': ref_field}, 0]}, ref_field, '$$REMOVE']}
