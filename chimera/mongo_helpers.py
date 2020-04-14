@@ -45,13 +45,16 @@ def create_to_strings_query(field):
         }
     }
 
-async def custom_aggregate(collection, query, function_name=None, session=None):
+async def custom_aggregate(collection, query, function_name=None, session=None, to_list=False):
     if function_name:
         logger.debug('%s query %s', function_name, query)
     
     cursor = collection.aggregate(query, session=session)
-    output = await cursor.fetch_next
-    output = cursor.next_object()
+    if to_list:
+        output = await cursor.to_list()
+    else:
+        output = await cursor.fetch_next
+        output = cursor.next_object()
 
     if function_name:
         logger.debug('%s response %s', function_name, output)
