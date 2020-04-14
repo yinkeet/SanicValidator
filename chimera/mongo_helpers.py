@@ -1,4 +1,5 @@
 from sanic.log import logger
+from typing import Tuple
 
 def create_sort_query(fields):
     """Creates a sort query for mongo aggregation"""
@@ -13,12 +14,11 @@ def create_sort_query(fields):
 
     return { (field.lower()):(1 if field.isupper() else -1) for field in results }
 
-def create_group_query(field, to_string=True):
-    field = '$' + field
+def create_group_query(*fields: Tuple[str, str, bool]):
     return [
         {'$group': {
-            '_id': None,
-            'results': {'$addToSet': {'$toString': field} if to_string else field}
+            **{'_id': None},
+            **{group: {'$addToSet': {'$toString': '$' + field} if to_string else '$' + field} for group, field, to_string in fields}
         }},
         {'$project': {
             '_id': 0
