@@ -51,7 +51,7 @@ async def custom_aggregate(collection, query, function_name=None, session=None, 
     
     cursor = collection.aggregate(query, session=session)
     if to_list:
-        output = await cursor.to_list()
+        output = await cursor.to_list(None)
     else:
         output = await cursor.fetch_next
         output = cursor.next_object()
