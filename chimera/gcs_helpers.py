@@ -5,7 +5,7 @@ from bson import ObjectId
 from six import binary_type
 
 
-def upload_file(bucket, destination, data, content_type):
+def _upload_file(bucket, destination, data, content_type):
     blob = bucket.blob(destination)
     blob.upload_from_string(data, content_type=content_type)
 
@@ -15,13 +15,16 @@ def upload_file(bucket, destination, data, content_type):
 
     return url
 
-async def upload_sanic_request_file(bucket, destination, image):
-    return await get_event_loop().run_in_executor(None, partial(upload_file,
+async def upload_file(bucket, destination, data, content_type):
+    return await get_event_loop().run_in_executor(None, partial(_upload_file,
         bucket=bucket,
         destination=destination,
-        data=image.body,
-        content_type=image.type
+        data=data,
+        content_type=content_type
     ))
+
+async def upload_sanic_request_file(bucket, destination, image):
+    return await upload_file(bucket, destination, image.body, image.type)
 
 async def delete_files(paths, bucket):
     if not paths:
