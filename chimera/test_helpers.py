@@ -6,12 +6,17 @@ from bson import ObjectId
 from cerberus import TypeDefinition
 from cerberus import Validator as BaseValidator
 from sanic.request import File
-
+from requests import Response
 
 class MockResponse:
-    def __init__(self, status_code: int, json_response: dict):
+    def __init__(self, status_code: int, json_response: dict={}, headers: dict={}):
         self.status_code = status_code
         self.json_response = json_response
+        self.headers = headers
+
+    @property
+    def content(self):
+        return b''
 
     @property
     def text(self):
