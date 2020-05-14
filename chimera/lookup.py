@@ -14,8 +14,13 @@ async def lookup(url, params=None, json=None, return_id=None):
     ))
 
     if response.status_code != 200:
+        logger.error({
+            'url': url,
+            'params': params,
+            'json': json
+        })
         logger.error(response.text)
-        raise ServerError(['Lookup has encountered an error', url, params, json])
+        raise ServerError(['Lookup has encountered an error'])
 
     results = response.json()['results']
     if len(results):
