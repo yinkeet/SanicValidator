@@ -25,7 +25,7 @@ def create_group_query(*fields: Tuple[str, str, bool]):
         }},
     ]
 
-def create_facet_extract_query(field, subfield):
+def create_facet_extract_query(field, subfield, value_if_field_is_empty=None):
     field = '$' + field
     return {'$cond': [
         {'$gt': [{'$size': field}, 0]},
@@ -33,7 +33,7 @@ def create_facet_extract_query(field, subfield):
             'vars': {'temp': {'$arrayElemAt': [field, 0]}},
             'in': '$$temp.' + subfield
         }},
-        field
+        field if value_if_field_is_empty is None else value_if_field_is_empty
     ]}
 
 def create_to_strings_query(field):
