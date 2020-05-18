@@ -45,6 +45,19 @@ def create_to_strings_query(field):
         }
     }
 
+def create_to_long_query(dest_field, source_field, remove_field_if_empty_query=False, double_reference=False):
+    source_field = ('$$' if double_reference else '$') + source_field
+    if remove_field_if_empty_query:
+        return {
+            dest_field: {'$cond': [
+                {'$gt': [source_field, 0]},
+                {'$toLong': source_field},
+                '$$REMOVE'
+            ]}
+        }
+    else:
+        return {dest_field: {'$toLong': source_field}}
+
 async def custom_aggregate(collection, query, function_name=None, session=None, to_list=False):
     if function_name:
         logger.debug('%s query %s', function_name, query)
