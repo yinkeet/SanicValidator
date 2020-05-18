@@ -58,6 +58,19 @@ def create_to_long_query(field, remove_field_if_empty_query=False):
     
     return query
 
+def create_to_query(convert, field, remove_field_if_empty_query=False):
+    query = {convert: field}
+    if remove_field_if_empty_query:
+        query = {
+            '$cond': [
+                {'$gt': [field, 0]},
+                query,
+                '$$REMOVE'
+            ]
+        }
+    
+    return query
+
 async def custom_aggregate(collection, query, function_name=None, session=None, to_list=False):
     if function_name:
         logger.debug('%s query %s', function_name, query)
