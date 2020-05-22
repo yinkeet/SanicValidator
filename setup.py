@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='chimera',
-    version='0.1.58',
+    version='0.1.59',
     description='A collection of helpers',
     url='git@github.com:yinkeet/chimera.git',
     author='Wong Yin Keet',
