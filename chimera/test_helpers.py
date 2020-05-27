@@ -61,7 +61,7 @@ def compare_jsons(json_1: Union[dict, str], json_2: Union[dict, str]) -> bool:
         pprint.pprint(json_2)
     return result
 
-class TestClientFiles(object):
+class SanicTestClientFiles(object):
     def __init__(self, *configs: Tuple[str, bytes, str, str]):
         self.configs = configs
 
