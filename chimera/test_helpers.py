@@ -2,12 +2,15 @@ import pprint
 from copy import deepcopy
 from datetime import datetime
 from json import loads
+from random import choice
+from string import ascii_lowercase
+from tempfile import TemporaryFile
 from typing import List, Tuple, Union
 
 from bson import ObjectId
 from cerberus import TypeDefinition
 from cerberus import Validator as BaseValidator
-from requests import Response
+from requests import Response, get
 from sanic.request import File
 
 from .hasher import crc32, crc32s
@@ -57,3 +60,23 @@ def compare_jsons(json_1: Union[dict, str], json_2: Union[dict, str]) -> bool:
         pprint.pprint(json_1)
         pprint.pprint(json_2)
     return result
+
+class TestClientFiles(object):
+    def __init__(self, *configs: Tuple[str, bytes, str, str]):
+        self.configs = configs
+
+    def __enter__(self):
+        self.files = {}
+        for name, content, suffix, content_type in self.configs:
+            self.files[name] = (''.join(choice(ascii_lowercase) for x in range(10)) + '.' + suffix, self._prepare_temporary_file(content, suffix), content_type)
+        return self.files
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        for _, f in self.files.items():
+            f[1].close()
+
+    def _prepare_temporary_file(self, content, suffix):
+        f = TemporaryFile(suffix=suffix)
+        f.write(content)
+        f.seek(0)
+        return f
