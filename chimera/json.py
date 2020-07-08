@@ -1,5 +1,10 @@
 import re
-from json import JSONDecodeError, JSONDecoder, load
+from datetime import datetime
+from json import JSONDecodeError, JSONDecoder
+from json import JSONEncoder as _JSONEncoder
+from json import load
+
+from bson import ObjectId
 
 _NOT_WHITESPACE = re.compile(r'[^\s]')
 
@@ -69,3 +74,11 @@ def load_stacked_file(path, *, cls=None, object_hook=None, parse_float=None, par
     with open(path) as f:
         data = load_stacked(f, **kw)
     return data
+
+class JSONEncoder(_JSONEncoder):
+    def default(self, o): # pylint: disable=E0202
+        if isinstance(o, ObjectId):
+            return str(o)
+        if isinstance(o, datetime):
+            return int(o.timestamp())
+        return _JSONEncoder.default(self, o)
