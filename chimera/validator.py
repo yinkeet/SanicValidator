@@ -1,9 +1,10 @@
+from datetime import datetime
 from functools import wraps
 from inspect import signature
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
-from cerberus import Validator, TypeDefinition
+from cerberus import TypeDefinition, Validator
 from sanic.exceptions import InvalidUsage, NotFound
 from sanic.request import File, Request
 
@@ -11,8 +12,9 @@ from sanic.request import File, Request
 class CustomValidator(Validator):
     # Types
     types_mapping = Validator.types_mapping.copy()
-    types_mapping['object_id'] = TypeDefinition('object_id', (ObjectId,), ())
     types_mapping['file'] = TypeDefinition('file', (File,), ())
+    types_mapping['datetime'] = TypeDefinition('datetime', (datetime,), ())
+    types_mapping['object_id'] = TypeDefinition('object_id', (ObjectId,), ())
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs['request']
