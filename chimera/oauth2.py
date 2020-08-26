@@ -24,6 +24,13 @@ class Authenticate(object):
                 allowed = any(role in roles for role in self.allowed_roles)
                 if not allowed:
                     raise Forbidden(['Insufficient role: authorized role is insufficient'])
+            if 'oauth' in signature(function).parameters:
+                kwargs['oauth'] = {
+                    'headers': {
+                        'x-oauth-scopes': scopes,
+                        'x-accepted-oauth-scopes': self.allowed_scopes
+                    }
+                }
             return await function(request, *args, **kwargs)
 
         return wrapper
