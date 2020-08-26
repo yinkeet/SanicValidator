@@ -27,8 +27,8 @@ class Authenticate(object):
             if 'oauth' in signature(function).parameters:
                 kwargs['oauth'] = {
                     'headers': {
-                        'x-oauth-scopes': scopes,
-                        'x-accepted-oauth-scopes': self.allowed_scopes
+                        'x-oauth-scopes': headers['scope'],
+                        'x-accepted-oauth-scopes': ' '.join(self.allowed_scopes)
                     }
                 }
             return await function(request, *args, **kwargs)
