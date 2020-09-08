@@ -12,7 +12,7 @@ def create_sort_query(fields):
             marker.add(lowercased_value)
             results.append(field)
 
-    return { (field.lower()):(1 if field.isupper() else -1) for field in results }
+    return { (field.lower()):(1 if any(x.isupper() for x in field) else -1) for field in results }
 
 def create_group_query(*fields: Tuple[str, str, bool]):
     return [
@@ -79,8 +79,8 @@ async def custom_aggregate(collection, query, function_name=None, session=None, 
     if to_list:
         output = await cursor.to_list(None)
     else:
-        output = await cursor.fetch_next
-        output = cursor.next_object()
+        output = await cursor.to_list(length=1)
+        output = output[0] if output else None
 
     if function_name:
         logger.debug('%s response %s', function_name, output)
