@@ -1,6 +1,6 @@
 import pkgutil
 from functools import wraps
-from inspect import signature
+from inspect import signature, iscoroutinefunction
 from typing import Any, cast, get_type_hints
 
 from sanic.log import logger
@@ -52,7 +52,10 @@ class Dependencies(object):
             kw['app'] = self.app
         if 'loop' in parameters:
             kw['app'] = self.loop
-        self.__components[instance.name] = instance.function(**kw)
+        if iscoroutinefunction(instance.function):
+            self.__components[instance.name] = await instance.function(**kw)
+        else:
+            self.__components[instance.name] = instance.function(**kw)
 
 class Register(object):
     def __init__(self, name):
