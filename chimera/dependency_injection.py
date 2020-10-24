@@ -16,7 +16,7 @@ class Dependencies(object):
         self.__components = {}
         self.app.dependencies = self
 
-    def register_package(self, package):
+    async def register_package(self, package):
         logger.debug('Register package \'' + package.__name__ + '\'')
         for importer, module_name, is_pkg in pkgutil.iter_modules(package.__path__, prefix=package.__name__ + "."):
             if not is_pkg:
@@ -25,14 +25,14 @@ class Dependencies(object):
                     instance = getattr(module, attr)
                     if(issubclass(type(instance), Register)):
                         logger.debug('Register component \'' + module.__name__ + '.' + attr + '\' as ' + instance.name)
-                        self._register(instance)
+                        await self._register(instance)
 
-    def register_module(self, module):
+    async def register_module(self, module):
         for attr in dir(module):
             instance = getattr(module, attr)
             if(issubclass(type(instance), Register)):
                 logger.debug('Register component \'' + module.__name__ + '.' + attr + '\' as ' + instance.name)
-                self._register(instance)
+                await self._register(instance)
 
     def register(self, name, object):
         logger.debug('Register component ' + name)
@@ -45,7 +45,7 @@ class Dependencies(object):
     def exists(self, name):
         return name in self.__components
 
-    def _register(self, instance):
+    async def _register(self, instance):
         parameters = signature(instance.function).parameters
         kw = {}
         if 'app' in parameters:
