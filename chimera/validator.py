@@ -39,6 +39,9 @@ class CustomValidator(Validator):
     def _normalize_coerce_object_id(self, value):
         return ObjectId(value)
 
+    def _normalize_coerce_empty_or_object_id(self, value):
+        return ObjectId(value) if len(value) else value
+
     def _normalize_coerce_boolean(self, value):
         if isinstance(value, str):
             return value.lower() in ('true', '1')
