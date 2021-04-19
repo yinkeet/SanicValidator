@@ -7,14 +7,14 @@ from sanic.log import logger
 
 
 def get_component(app, name):
-    return app.dependencies.get_component(name)
+    return app.ctx.dependencies.get_component(name)
 
 class Dependencies(object):
     def __init__(self, app, loop):
         self.app = app
         self.loop = loop
         self.__components = {}
-        self.app.dependencies = self
+        self.app.ctx.dependencies = self
 
     async def register_package(self, package):
         logger.debug('Register package \'' + package.__name__ + '\'')
@@ -69,7 +69,7 @@ def inject(function):
     @wraps(function)    
     async def wrapper(request, *args, **kwargs):
         for parameter in signature(function).parameters:
-            dependencies = request.app.dependencies
+            dependencies = request.app.ctx.dependencies
             if dependencies.exists(parameter):
                 kwargs[parameter] = dependencies.get_component(parameter)
 
